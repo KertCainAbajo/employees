@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Employee System",
+    "slug": "employee-system",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "android": {
+      "usesCleartextTraffic": true,
+      "package": "com.student.employeesystem"
+    },
+    "ios": {
+      "bundleIdentifier": "com.student.employeesystem",
+      "supportsTablet": true
+    },
+    "extra": {
+      "apiUrl": "https://kertabajo.mooo.com/employees"
+    },
+    "plugins": [
+      "expo-status-bar"
+    ]
+  }
+}

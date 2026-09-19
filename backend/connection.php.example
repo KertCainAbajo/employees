@@ -1,0 +1,18 @@
+<?php
+class dbObj {
+    private $servername = 'localhost';
+    private $username = 'YOUR_FREEHOSTIA_DB_USERNAME';
+    private $password = 'YOUR_FREEHOSTIA_DB_PASSWORD';
+    private $dbname = 'YOUR_FREEHOSTIA_DB_NAME';
+
+    public function getConnstring() {
+        $conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
+        if ($conn->connect_error) {
+            http_response_code(500);
+            die(json_encode(['message' => 'Database connection failed']));
+        }
+        $conn->set_charset('utf8mb4');
+        return $conn;
+    }
+}
+?>
