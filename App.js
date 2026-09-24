@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { API_TOKEN, API_URL } from './src/config';
+import { getRandomQuote } from './src/services/quoteApi';
 
 const COLORS = {
   navy: '#5b21b6',
@@ -166,6 +167,8 @@ export default function App() {
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
+  const [quote, setQuote] = useState(null);
+  const [quoteLoading, setQuoteLoading] = useState(true);
 
   const showToast = useCallback((type, title, message) => {
     setToast({ id: Date.now(), type, title, message });
@@ -187,9 +190,22 @@ export default function App() {
     }
   }, []);
 
+  const loadQuote = useCallback(async () => {
+    setQuoteLoading(true);
+    try {
+      const data = await getRandomQuote();
+      setQuote({ text: data.quote, author: data.author });
+    } catch {
+      setQuote({ text: 'Great teams are built one thoughtful action at a time.', author: 'Employee Hub' });
+    } finally {
+      setQuoteLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadEmployees();
-  }, [loadEmployees]);
+    loadQuote();
+  }, [loadEmployees, loadQuote]);
 
   const departments = useMemo(() => {
     return ['All', ...new Set(employees.map((employee) => employee.department).filter(Boolean))];
@@ -311,6 +327,8 @@ export default function App() {
           <StatTile label="Complete" value={completeProfiles} accent="green" />
         </View>
 
+        <QuoteCard quote={quote} loading={quoteLoading} onRefresh={loadQuote} />
+
         <View style={styles.searchBox}>
           <View style={styles.searchIcon}><View style={styles.searchHandle} /></View>
           <TextInput value={query} onChangeText={setQuery} placeholder="Search employees" placeholderTextColor="#9aa8bd" style={styles.searchInput} returnKeyType="search" />
@@ -374,6 +392,19 @@ function StatTile({ label, value, accent }) {
       <View style={[styles.statDot, accent === 'purple' ? styles.statDotPurple : accent === 'green' ? styles.statDotGreen : null]} />
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function QuoteCard({ quote, loading, onRefresh }) {
+  return (
+    <View style={styles.quoteCard}>
+      <View style={styles.quoteMark}><Text style={styles.quoteMarkText}>Q</Text></View>
+      <View style={styles.quoteCopy}>
+        <Text style={styles.quoteKicker}>TEAM INSPIRATION</Text>
+        {loading ? <ActivityIndicator size="small" color={COLORS.blue} /> : <><Text style={styles.quoteText} numberOfLines={2}>{quote?.text}</Text><Text style={styles.quoteAuthor}>- {quote?.author}</Text></>}
+      </View>
+      <Pressable style={styles.quoteRefresh} onPress={onRefresh} disabled={loading}><Text style={styles.quoteRefreshText}>New</Text></Pressable>
     </View>
   );
 }
@@ -529,6 +560,15 @@ const styles = StyleSheet.create({
   statDotGreen: { backgroundColor: COLORS.green },
   statValue: { color: COLORS.ink, fontSize: 21, fontWeight: '900' },
   statLabel: { color: COLORS.muted, fontSize: 11, fontWeight: '700', marginTop: 3 },
+  quoteCard: { backgroundColor: '#f1eafe', borderRadius: 15, minHeight: 86, padding: 12, flexDirection: 'row', alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: '#e4d5fb' },
+  quoteMark: { width: 38, height: 38, borderRadius: 13, backgroundColor: COLORS.blue, justifyContent: 'center', alignItems: 'center' },
+  quoteMarkText: { color: COLORS.white, fontSize: 16, fontWeight: '900' },
+  quoteCopy: { flex: 1, marginLeft: 10 },
+  quoteKicker: { color: COLORS.blue, fontSize: 9, fontWeight: '900', letterSpacing: 1.1, marginBottom: 4 },
+  quoteText: { color: COLORS.ink, fontSize: 12, lineHeight: 17, fontWeight: '700' },
+  quoteAuthor: { color: COLORS.muted, fontSize: 10, marginTop: 3, fontWeight: '700' },
+  quoteRefresh: { backgroundColor: COLORS.white, borderRadius: 9, paddingHorizontal: 9, paddingVertical: 8, marginLeft: 7 },
+  quoteRefreshText: { color: COLORS.blue, fontSize: 10, fontWeight: '900' },
   searchBox: { backgroundColor: COLORS.white, borderRadius: 14, height: 52, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, borderWidth: 1, borderColor: COLORS.line },
   searchIcon: { width: 19, height: 19, borderRadius: 10, borderWidth: 2, borderColor: '#8b5cf6', marginRight: 13 },
   searchHandle: { position: 'absolute', width: 8, height: 2, borderRadius: 2, backgroundColor: '#8b5cf6', right: -6, bottom: -3, transform: [{ rotate: '45deg' }] },

@@ -1,6 +1,11 @@
 # Employee System
 
-Expo/React Native employee CRUD app connected to the Freehostia PHP API.
+Expo/React Native employee CRUD app connected to the Freehostia PHP API and DummyJSON Quotes API.
+
+## Dual APIs
+
+- Custom API: `http://kertabajo.mooo.com/employees` handles employee GET, POST, PUT, and DELETE operations.
+- External API: `https://dummyjson.com/quotes/random` supplies the Team Inspiration card. It requires no API key.
 
 ## Run with Expo Go
 
